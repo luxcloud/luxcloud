@@ -3,12 +3,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Query = void 0;
 class Query {
     constructor(className) {
+        this._headers = {};
         this.className = className;
     }
     get pathname() {
         return !this.objectId
             ? `/classes/${this.className}`
             : `/classes/${this.className}/${this.objectId}`;
+    }
+    get headers() {
+        if (this._token) {
+            this._headers['X-LC-Session'] = this._token;
+        }
+        return this._headers;
     }
     get params() {
         const parameters = {};
@@ -46,6 +53,10 @@ class Query {
         this.objectId = objectId;
         return this;
     }
+    token(value) {
+        this._token = value;
+        return this;
+    }
     limit(value) {
         this._limit = Number(value);
         return this;
@@ -75,16 +86,16 @@ class Query {
         return this;
     }
     get() {
-        return this.axios.get(this.pathname, { params: this.params });
+        return this.axios.get(this.pathname, { params: this.params, headers: this.headers });
     }
     insert(data) {
-        return this.axios.post(this.pathname, data);
+        return this.axios.post(this.pathname, data, { headers: this.headers });
     }
     update(data) {
-        return this.axios.put(this.pathname, data, { params: this.params });
+        return this.axios.put(this.pathname, data, { params: this.params, headers: this.headers });
     }
     delete() {
-        return this.axios.delete(this.pathname, { params: this.params });
+        return this.axios.delete(this.pathname, { params: this.params, headers: this.headers });
     }
 }
 exports.Query = Query;
