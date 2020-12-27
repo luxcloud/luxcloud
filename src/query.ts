@@ -7,6 +7,8 @@ type Params = {
 export class Query {
   className: string
   objectId?: string
+  _token?: string
+  _headers: any = {}
   axios?: AxiosInstance
 
   private _skip?: number
@@ -21,6 +23,14 @@ export class Query {
     return !this.objectId
       ? `/classes/${this.className}`
       : `/classes/${this.className}/${this.objectId}`
+  }
+
+  get headers(): any {
+    if (this._token) {
+      this._headers['X-LC-Session'] = this._token
+    }
+
+    return this._headers
   }
 
   get params(): Params {
@@ -52,6 +62,11 @@ export class Query {
 
   object(objectId: string) {
     this.objectId = objectId
+    return this
+  }
+
+  token(value: string) {
+    this._token = value
     return this
   }
 
@@ -91,18 +106,18 @@ export class Query {
   }
 
   get() {
-    return this.axios.get(this.pathname, { params: this.params })
+    return this.axios.get(this.pathname, { params: this.params, headers: this.headers })
   }
 
   insert(data: any) {
-    return this.axios.post(this.pathname, data)
+    return this.axios.post(this.pathname, data, { headers: this.headers })
   }
 
   update(data: any) {
-    return this.axios.put(this.pathname, data, { params: this.params })
+    return this.axios.put(this.pathname, data, { params: this.params, headers: this.headers })
   }
 
   delete() {
-    return this.axios.delete(this.pathname, { params: this.params })
+    return this.axios.delete(this.pathname, { params: this.params, headers: this.headers })
   }
 }
